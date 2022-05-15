@@ -1,0 +1,26 @@
+{
+  "name": "lazy-context",
+  "version": "0.1.0",
+  "description": "RSpec-style lazy variable management for tests",
+  "author": "Michael Chinigo <mchinigo@vmware.com>",
+  "scripts": {
+    "lint": "eslint 'src/**/*.ts'",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@spotify/eslint-config-base": "^13.0.1",
+    "@spotify/eslint-config-typescript": "^13.0.1",
+    "@types/eslint-plugin-prettier": "^3.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "eslint": "^8.15.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-jest": "^26.2.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^28.1.0",
+    "@types/jest": "^27.5.1",
+    "prettier": "^2.6.2",
+    "ts-jest": "^28.0.2",
+    "typescript": "^4.6.4"
+  }
+}
