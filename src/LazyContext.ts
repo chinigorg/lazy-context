@@ -2,13 +2,15 @@ const isFunction = (value: unknown): value is (...args: unknown[]) => unknown =>
   return value !== undefined && value !== null && typeof value === 'function'
 }
 
-type MaybeThunk<V> = V | (() => V) | undefined
+type NoArgsFunction<V> = () => V
+
+type MaybeThunk<V> = NoArgsFunction<V> | V | undefined
 
 type State<T> = Partial<{
   [K in keyof T]: MaybeThunk<T[K]>
 }>
 
-export class Context<T> {
+export class LazyContext<T> {
   private readonly defaultState?: State<T>
 
   private currentState: State<T> = {}
