@@ -10,27 +10,49 @@ type State<T> = Partial<{
   [K in keyof T]: MaybeThunk<T[K]>
 }>
 
-export class LazyContext<T> {
-  private readonly defaultState?: State<T>
+type ILazyContext<T> = T & {
+  get: <K extends keyof T>(key: K) => T[K] | undefined
+  set: <K extends keyof T>(key: K, val: MaybeThunk<T[K]>) => boolean
+  reset: () => void
+}
 
-  private currentState: State<T> = {}
+export const lazyContext = <T>(defaultState?: State<T>): ILazyContext<T> => {
+  const _defaultState: State<T> = Object.freeze({ ...defaultState })
+  let _currentState: State<T> = {}
 
-  public constructor(defaultState?: State<T>) {
-    this.defaultState = Object.freeze(defaultState)
-    this.reset()
+  const context = {
+    get: <K extends keyof T>(key: K): T[K] | undefined => {
+      const val: MaybeThunk<T[K]> = _currentState[key]
+
+      return isFunction(val) ? val() : val
+    },
+    set: <K extends keyof T>(key: K, val: MaybeThunk<T[K]>): boolean => {
+      const isNew = !(key in _currentState)
+      _currentState[key] = val
+      return isNew
+    },
+    reset: (): void => {
+      _currentState = { ..._defaultState }
+    },
   }
 
-  public get<K extends keyof T>(key: K): T[K] | undefined {
-    const val: MaybeThunk<T[K]> = this.currentState[key]
+  context.reset()
 
-    return isFunction(val) ? val() : val
-  }
+  return new Proxy<ILazyContext<T>>(context as ILazyContext<T>, {
+    get(target: ILazyContext<T>, p: string | symbol): unknown {
+      if (p === 'get') {
+        return target.get
+      }
 
-  public set<K extends keyof T>(key: K, val: MaybeThunk<T[K]>): void {
-    this.currentState[key] = val
-  }
+      if (p === 'set') {
+        return target.set
+      }
 
-  public reset(): void {
-    this.currentState = { ...this.defaultState }
-  }
+      if (p === 'reset') {
+        return target.reset
+      }
+
+      return target.get(p as unknown as keyof T)
+    },
+  })
 }

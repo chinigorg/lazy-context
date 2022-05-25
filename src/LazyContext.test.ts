@@ -1,4 +1,4 @@
-import { LazyContext } from './LazyContext'
+import { lazyContext } from './LazyContext'
 
 interface TestCtx {
   someString: string
@@ -6,10 +6,10 @@ interface TestCtx {
   someAsyncString: Promise<string>
 }
 
-describe('Context', () => {
+describe('lazyContext', () => {
   describe('get/set', () => {
     describe('when no default values have been provided', () => {
-      const ctx = new LazyContext<TestCtx>()
+      const ctx = lazyContext<TestCtx>()
 
       afterEach(() => {
         ctx.reset()
@@ -103,7 +103,7 @@ describe('Context', () => {
     })
 
     describe('when default values have been provided', () => {
-      const ctx = new LazyContext<TestCtx>({
+      const ctx = lazyContext<TestCtx>({
         someString: 'foo',
         someNumber: 0,
       })
@@ -120,9 +120,20 @@ describe('Context', () => {
     })
   })
 
+  describe('dynamic getters', () => {
+    const ctx = lazyContext<TestCtx>({
+      someString: 'foo',
+    })
+
+    it('provisions a dynamic getter for all entries in context', () => {
+      expect(ctx.someString).toEqual('foo')
+      expect(ctx.someNumber).toBeUndefined()
+    })
+  })
+
   describe('reset', () => {
     describe('when default values are provided', () => {
-      const ctx = new LazyContext<TestCtx>({
+      const ctx = lazyContext<TestCtx>({
         someString: 'foo',
       })
 
@@ -143,7 +154,7 @@ describe('Context', () => {
     })
 
     describe('when no default values are provided', () => {
-      const ctx = new LazyContext<TestCtx>()
+      const ctx = lazyContext<TestCtx>()
 
       it('reset has no effect', () => {
         ctx.reset()
